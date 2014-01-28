@@ -1,8 +1,9 @@
 #include <SDL.h>
 #include <vector>
-#include <CellularAutomaton.h>
+#include <Cursor.h>
+#include <CEvent.h>
 
-class CApp{
+class CApp : public CEvent{
 private:
 	bool Running;
 
@@ -19,6 +20,13 @@ private:
 	Uint32 Color0;
 	Uint32 Color1;
 	Uint32 Color2;
+
+	Uint32 CursorColor;
+
+	Cursor cursor;
+
+	bool paused;
+
 
 public:
 	int screenWidth, screenHeight;
@@ -40,5 +48,11 @@ public:
 	void OnRender();
 
 	void OnCleanup();
+
+	void OnExit();
+
+	void OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode);
+
+	void OnMouseMove(int mX, int mY, int relX, int relY, bool Left,bool Right,bool Middle);
 
 };

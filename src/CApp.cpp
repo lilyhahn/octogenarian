@@ -1,10 +1,12 @@
 #include <CApp.h>
 
+
 CApp::CApp(){
 	Surf_Display = NULL;
 	Running = true;
+	paused = true;
 	scale = 4;
-};
+}
 
 int CApp::OnExecute(){
 	if(!OnInit()){
@@ -43,6 +45,7 @@ bool CApp::OnInit(){
         return false;
     }
 
+    cursor = Cursor((screenWidth / scale) / 2, (screenHeight / scale) / 2);
 
     for(int i = 0; i < 322; i++) { // init them all to false
    		KEYS[i] = false;
@@ -58,7 +61,7 @@ bool CApp::OnInit(){
 }
 
 void CApp::OnEvent(SDL_Event* Event){
-	switch (Event->type) {
+	/*switch (Event->type) {
     // exit if the window is closed
     case SDL_QUIT:
         Running = false; // set game state to done
@@ -72,20 +75,29 @@ void CApp::OnEvent(SDL_Event* Event){
         break;
     default:
         break;
-    }
+    }*/
+    CEvent::OnEvent(Event);
 }
 
 void CApp::HandleInput(){
-	if(KEYS[SDLK_ESCAPE]) Running = false;
+	/*if(KEYS[SDLK_ESCAPE]) Running = false;
+	if(KEYS[SDLK_UP]) cursor.Move(0, 1);
+	if(KEYS[SDLK_DOWN]) cursor.Move(0, -1);
+	if(KEYS[SDLK_RIGHT]) cursor.Move(1, 0);
+	if(KEYS[SDLK_LEFT]) cursor.Move(-1, 0);
+	if(KEYS[SDLK_SPACE]) cursor.Draw(automaton, 1);
+	if(KEYS[SDLK_RETURN]) paused = !paused;*/
 }
 
 void CApp::OnLoop(){
-	automaton.NextGeneration();
+	if(!paused)
+		automaton.NextGeneration();
 }
 
 void CApp::OnRender(){
 	std::vector<std::vector<int> > data = automaton.GetData();
 	SDL_FillRect(Surf_Display, NULL, Color0);
+	SDL_Rect cur = {cursor.GetX() * scale, cursor.GetY() * scale, scale, scale};
 	for(int i = 0; i < data.size(); i++){
 		for(int j = 0; j < data[0].size(); j++){
 			//if(data[i][j]){
@@ -107,6 +119,7 @@ void CApp::OnRender(){
 			//}
 		}
 	}
+	if(paused) SDL_FillRect(Surf_Display, &cur, CursorColor);
 	//SDL_Delay(1000);
 	SDL_Flip(Surf_Display);
 }
@@ -121,15 +134,54 @@ void CApp::InitCA(){
 	rule.b.push_back(2);
 	rule.c.push_back(3);
 	automaton = CellularAutomaton(rule, screenWidth / scale, screenHeight / scale);
-	unsigned long seedPosX =  automaton.GetData().size() / 2;
+	/*unsigned long seedPosX =  automaton.GetData().size() / 2;
 	unsigned long seedPosY = automaton.GetData()[0].size() / 2;
 
 	automaton.SetData(seedPosX, seedPosY, 1);
-	automaton.SetData(seedPosX, seedPosY - 1, 1);
+	automaton.SetData(seedPosX, seedPosY - 1, 1);*/
 }
 
 void CApp::InitColors(){
 	Color0 = SDL_MapRGB(Surf_Display->format, 255, 255, 255);
-	Color1 = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Color2 = SDL_MapRGB(Surf_Display->format, 2, 227, 145);
+	Color2 = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Color1 = SDL_MapRGB(Surf_Display->format, 2, 227, 145);
+	CursorColor = SDL_MapRGBA(Surf_Display->format, 105, 105, 105, 100);
 }
+
+void CApp::OnExit(){
+	Running = false;
+}
+
+void CApp::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode){
+	switch(sym){
+		case SDLK_ESCAPE:
+			Running = false;
+			break;
+		case SDLK_RETURN:
+			paused = !paused;
+			break;
+		case SDLK_UP:
+			cursor.Move(0, 1);
+			break;
+		case SDLK_DOWN:
+			cursor.Move(0, -1);
+			break;
+		case SDLK_RIGHT:
+			cursor.Move(1, 0);
+			break;
+		case SDLK_LEFT:
+			cursor.Move(-1, 0);
+			break;
+		case SDLK_SPACE:
+			cursor.Draw(automaton, 1);
+			break;
+		case SDLK_PLUS:
+			scale++;
+			break;
+	}
+}
+
+void CApp::OnMouseMove(int mX, int mY, int relX, int relY, bool Left,bool Right,bool Middle){
+	//cursor.SetPos(relX, relY);
+}
+
