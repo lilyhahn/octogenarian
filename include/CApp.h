@@ -27,6 +27,8 @@ private:
 
 	bool paused;
 
+	int brush;
+
 
 public:
 	int screenWidth, screenHeight;

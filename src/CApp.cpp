@@ -6,6 +6,7 @@ CApp::CApp(){
 	Running = true;
 	paused = true;
 	scale = 4;
+	brush = 1;
 }
 
 int CApp::OnExecute(){
@@ -173,10 +174,40 @@ void CApp::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode){
 			cursor.Move(-1, 0);
 			break;
 		case SDLK_SPACE:
-			cursor.Draw(automaton, 1);
+			cursor.Draw(automaton, brush);
 			break;
-		case SDLK_PLUS:
-			scale++;
+		case SDLK_n:
+			automaton.NextGeneration();
+			break;
+		case SDLK_1:
+			brush = 1;
+			break;
+		case SDLK_2:
+			brush = 2;
+			break;
+		case SDLK_3:
+			brush = 3;
+			break;
+		case SDLK_4:
+			brush = 4;
+			break;
+		case SDLK_5:
+			brush = 5;
+			break;
+		case SDLK_6:
+			brush = 6;
+			break;
+		case SDLK_7:
+			brush = 7;
+			break;
+		case SDLK_8:
+			brush = 8;
+			break;
+		case SDLK_9:
+			brush = 9;
+			break;
+		case SDLK_0:
+			brush = 0;
 			break;
 	}
 }
