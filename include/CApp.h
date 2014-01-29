@@ -57,4 +57,6 @@ public:
 
 	void OnMouseMove(int mX, int mY, int relX, int relY, bool Left,bool Right,bool Middle);
 
+	void OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
+
 };

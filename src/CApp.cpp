@@ -209,6 +209,9 @@ void CApp::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode){
 		case SDLK_0:
 			brush = 0;
 			break;
+		case SDLK_c:
+			automaton.Clear();
+			break;
 	}
 }
 
@@ -216,3 +219,13 @@ void CApp::OnMouseMove(int mX, int mY, int relX, int relY, bool Left,bool Right,
 	//cursor.SetPos(relX, relY);
 }
 
+void CApp::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode){
+	if(sym == SDLK_w)
+		cursor.Move(0, 1);
+	if(sym == SDLK_s)
+		cursor.Move(0, -1);
+	if(sym == SDLK_d)
+		cursor.Move(1, 0);
+	if(sym == SDLK_a)
+		cursor.Move(-1, 0);
+}

@@ -71,3 +71,13 @@ std::vector<std::vector<int> > CellularAutomaton::NextGeneration(){
 	data = nextData;
 	return data;
 }
+
+void CellularAutomaton::Clear(){
+	int size = data.size();
+	for(int i = 0; i < size; i++){
+		data[i].clear();
+	}
+	for(int i = 0; i < size; i++){
+		data[i].resize(size);
+	}
+}
