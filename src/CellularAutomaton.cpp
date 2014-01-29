@@ -81,3 +81,6 @@ void CellularAutomaton::Clear(){
 		data[i].resize(size);
 	}
 }
+Rule CellularAutomaton::GetRule(){
+	return rule;
+}

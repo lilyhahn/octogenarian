@@ -21,7 +21,6 @@ int CApp::OnExecute(){
 			OnEvent(&Event);
 		}
 
-		HandleInput();
 		OnRender();
 		OnLoop();
 	}
@@ -62,21 +61,6 @@ bool CApp::OnInit(){
 }
 
 void CApp::OnEvent(SDL_Event* Event){
-	/*switch (Event->type) {
-    // exit if the window is closed
-    case SDL_QUIT:
-        Running = false; // set game state to done
-        break;
-    // check for keypresses
-    case SDL_KEYDOWN:
-        KEYS[Event->key.keysym.sym] = true;
-        break;
-    case SDL_KEYUP:
-        KEYS[Event->key.keysym.sym] = false;
-        break;
-    default:
-        break;
-    }*/
     CEvent::OnEvent(Event);
 }
 
@@ -97,27 +81,13 @@ void CApp::OnLoop(){
 
 void CApp::OnRender(){
 	std::vector<std::vector<int> > data = automaton.GetData();
-	SDL_FillRect(Surf_Display, NULL, Color0);
+	SDL_FillRect(Surf_Display, NULL, Colors[0]);
 	SDL_Rect cur = {cursor.GetX() * scale, cursor.GetY() * scale, scale, scale};
 	for(int i = 0; i < data.size(); i++){
 		for(int j = 0; j < data[0].size(); j++){
-			//if(data[i][j]){
 			SDL_Rect cell = {i * scale, j * scale, scale, scale};
-			switch(data[i][j]){
-				case 0:
-					SDL_FillRect(Surf_Display, &cell, Color0);
-					break;
-				case 1:
-					SDL_FillRect(Surf_Display, &cell, Color1);
-					break;
-				case 2:
-					SDL_FillRect(Surf_Display, &cell, Color2);
-					break;
-				default: //if we don't have a color for this, do the last one
-					SDL_FillRect(Surf_Display, &cell, Color2);
-					break;
-			}
-			//}
+			if(data[i][j])
+				SDL_FillRect(Surf_Display, &cell, Colors[data[i][j]]);
 		}
 	}
 	if(paused) SDL_FillRect(Surf_Display, &cur, CursorColor);
@@ -143,9 +113,16 @@ void CApp::InitCA(){
 }
 
 void CApp::InitColors(){
-	Color0 = SDL_MapRGB(Surf_Display->format, 255, 255, 255);
-	Color2 = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Color1 = SDL_MapRGB(Surf_Display->format, 2, 227, 145);
+	Colors[0] = SDL_MapRGB(Surf_Display->format, 255, 255, 255);
+	Colors[1] = SDL_MapRGB(Surf_Display->format, 2, 227, 145);
+	Colors[2] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Colors[3] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Colors[4] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Colors[5] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Colors[6] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Colors[7] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Colors[8] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
+	Colors[9] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
 	CursorColor = SDL_MapRGBA(Surf_Display->format, 105, 105, 105, 100);
 }
 
@@ -215,17 +192,13 @@ void CApp::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode){
 	}
 }
 
-void CApp::OnMouseMove(int mX, int mY, int relX, int relY, bool Left,bool Right,bool Middle){
-	//cursor.SetPos(relX, relY);
-}
-
 void CApp::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode){
 	if(sym == SDLK_w)
-		cursor.Move(0, 1);
+		cursor.Move(0, 5);
 	if(sym == SDLK_s)
-		cursor.Move(0, -1);
+		cursor.Move(0, -5);
 	if(sym == SDLK_d)
-		cursor.Move(1, 0);
+		cursor.Move(5, 0);
 	if(sym == SDLK_a)
-		cursor.Move(-1, 0);
+		cursor.Move(-5, 0);
 }

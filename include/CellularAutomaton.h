@@ -15,4 +15,5 @@ class CellularAutomaton{
 		std::vector<std::vector<int> > NextGeneration();
 		void SetData(int x, int y, int d);
 		void Clear();
+		Rule GetRule();
 };

@@ -19,6 +19,10 @@ int Cursor::GetY(){
 }
 
 void Cursor::Draw(CellularAutomaton& ca, int state){
+	Rule r = ca.GetRule();
+	for(int i = 0; i < r.c.size(); i++){
+		if(state > r.c[i] - 1) return;
+	}
 	ca.SetData(x, y, state);
 }
 
