@@ -1,5 +1,7 @@
 #include <CellularAutomaton.h>
 #include <iostream>
+#include <RLE.h>
+
 
 CellularAutomaton::CellularAutomaton(){
 
@@ -83,4 +85,40 @@ void CellularAutomaton::Clear(){
 }
 Rule CellularAutomaton::GetRule(){
 	return rule;
+}
+
+bool IsEmpty(std::vector<int> arr){
+	for(int i = 0; i < arr.size(); i++){
+		if(arr[i]) return false;
+	}
+	return true;
+}
+
+void CellularAutomaton::SaveMCL(std::string file){
+	bool empty = false;
+	std::ofstream out (file.c_str(), std::ofstream::out);
+	out << "#MCell 4.00\n";
+	out << "#GAME Generations\n";
+	out << "#BOARD " << data.size() << "x" << data[0].size() << std::endl;
+	//out << "#RULE " << rule.s << "/" << rule.b << "/" << rule.c << std::endl;
+	std::string to_encode = "";
+	for(int i = 0; i < data.size(); i++){
+		if(encode(to_encode).size() >= 50){
+			out << "#L " << encode(to_encode) << std::endl;
+			to_encode = "";
+		}
+		for(int j = 0; j < data[0].size(); j++){
+			if(IsEmpty(data[i])){
+				empty = true;
+				break;
+			}
+			if(!data[i][j]) to_encode += ".";
+			else{
+				to_encode += char(data[i][j] + 64);
+			}
+		}
+		//if(!empty)
+			to_encode += "$";
+	}
+	out << "#L " << encode(to_encode);
 }

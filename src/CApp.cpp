@@ -189,6 +189,9 @@ void CApp::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode){
 		case SDLK_c:
 			automaton.Clear();
 			break;
+		case SDLK_e:
+			automaton.SaveMCL("test.mcl");
+			break;
 	}
 }
 

@@ -1,5 +1,7 @@
 #include <vector>
 #include <rule.h>
+#include <fstream>
+#include <string>
 
 class CellularAutomaton{
 	private:
@@ -16,4 +18,5 @@ class CellularAutomaton{
 		void SetData(int x, int y, int d);
 		void Clear();
 		Rule GetRule();
+		void SaveMCL(std::string file);
 };
