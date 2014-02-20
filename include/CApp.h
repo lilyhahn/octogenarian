@@ -7,7 +7,9 @@ class CApp : public CEvent{
 private:
 	bool Running;
 
-	SDL_Surface* Surf_Display;
+	SDL_Window *sdlWindow;
+	SDL_Renderer *renderer;
+	SDL_Texture *sdlTexture;
 
 	int scale;
 
@@ -17,9 +19,9 @@ private:
 
 	CellularAutomaton automaton;
 
-	Uint32 Colors[10];
+	SDL_Color Colors[10];
 
-	Uint32 CursorColor;
+	SDL_Color CursorColor;
 
 	Cursor cursor;
 
@@ -51,8 +53,8 @@ public:
 
 	void OnExit();
 
-	void OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode);
+	void OnKeyUp(SDL_Keycode sym, Uint16 mod);
 
-	void OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
+	void OnKeyDown(SDL_Keycode sym, Uint16 mod);
 
 };
