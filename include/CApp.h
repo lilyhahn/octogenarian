@@ -57,5 +57,7 @@ public:
 	void OnKeyUp(SDL_Keycode sym, Uint16 mod);
 
 	void OnKeyDown(SDL_Keycode sym, Uint16 mod);
+	
+	void OnFingerDown(SDL_TouchID deviceID, SDL_FingerID fingerID, float x, float y, float pressure);
 
 };

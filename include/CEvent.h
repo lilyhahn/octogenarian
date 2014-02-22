@@ -60,6 +60,8 @@ class CEvent {
         virtual void OnExit();
  
         virtual void OnUser(Uint8 type, int code, void* data1, void* data2);
+
+        virtual void OnFingerDown(SDL_TouchID deviceID, SDL_FingerID fingerID, float x, float y, float pressure);
 };
  
 #endif

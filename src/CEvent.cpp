@@ -32,6 +32,9 @@ void CEvent::OnEvent(SDL_Event* Event) {
             }
             break;
         }*/
+
+        case SDL_FINGERDOWN:
+            OnFingerDown(Event->tfinger.touchId, Event->tfinger.fingerId, Event->tfinger.x, Event->tfinger.y, Event->tfinger.pressure);
  
         case SDL_KEYDOWN: {
             OnKeyDown(Event->key.keysym.sym,Event->key.keysym.mod);
@@ -233,4 +236,8 @@ void CEvent::OnExit() {
  
 void CEvent::OnUser(Uint8 type, int code, void* data1, void* data2) {
     //Pure virtual, do nothing
+}
+
+void CEvent::OnFingerDown(SDL_TouchID deviceID, SDL_FingerID fingerID, float x, float y, float pressure){
+
 }

@@ -1,4 +1,5 @@
 #include <CApp.h>
+#include <cmath>
 
 
 CApp::CApp(){
@@ -51,6 +52,8 @@ bool CApp::OnInit(){
     renderer = SDL_CreateRenderer(sdlWindow, -1, 0);
 
     cursor = Cursor((screenWidth / scale) / 2, (screenHeight / scale) / 2);
+
+    SDL_ShowCursor(false);
 
     Uint32 rmask, gmask, bmask, amask;
 
@@ -266,11 +269,16 @@ void CApp::OnKeyUp(SDL_Keycode sym, Uint16 mod){
 
 void CApp::OnKeyDown(SDL_Keycode sym, Uint16 mod){
 	if(sym == SDLK_w)
-		cursor.Move(0, 5);
+		cursor.Move(0, 1);
 	if(sym == SDLK_s)
-		cursor.Move(0, -5);
+		cursor.Move(0, -1);
 	if(sym == SDLK_d)
-		cursor.Move(5, 0);
+		cursor.Move(1, 0);
 	if(sym == SDLK_a)
-		cursor.Move(-5, 0);
+		cursor.Move(-1, 0);
+}
+
+void CApp::OnFingerDown(SDL_TouchID deviceID, SDL_FingerID fingerID, float x, float y, float pressure){
+	cursor.Move(round(x), round(y));
+	cursor.Draw(automaton, 1);
 }
