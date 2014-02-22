@@ -181,17 +181,18 @@ void CApp::InitColors(){
 	CursorColor.r = 105;
 	CursorColor.b = 105;
 	CursorColor.g = 105;*/
-	Colors[0] = SDL_MapRGB(Surf_Display->format, 255, 255, 255);
-	Colors[1] = SDL_MapRGB(Surf_Display->format, 2, 227, 145);
-	Colors[2] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[3] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[4] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[5] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[6] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[7] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[8] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[9] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	CursorColor = SDL_MapRGBA(Surf_Display->format, 105, 105, 105, 100);
+	SDL_PixelFormat* format = SDL_AllocFormat(SDL_GetWindowPixelFormat(sdlWindow));
+	Colors[0] = SDL_MapRGB(format, 255, 255, 255);
+	Colors[1] = SDL_MapRGB(format, 2, 227, 145);
+	Colors[2] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[3] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[4] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[5] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[6] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[7] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[8] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[9] = SDL_MapRGB(format, 227, 2, 84);
+	CursorColor = SDL_MapRGBA(format, 105, 105, 105, 100);
 }
 
 void CApp::OnExit(){
