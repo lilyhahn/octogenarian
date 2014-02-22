@@ -36,22 +36,48 @@ bool CApp::OnInit(){
         return false;
     }
  	
- 	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
- 	screenWidth = videoInfo->current_w;
- 	screenHeight = videoInfo->current_h;
+ 	SDL_DisplayMode videoInfo; 
+ 	SDL_GetCurrentDisplayMode(0, &videoInfo);
+ 	screenWidth = videoInfo.w;
+ 	screenHeight = videoInfo.h;
  	//screenWidth = 640;
  	//screenHeight = 480;
-    if((Surf_Display = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN)) == NULL) {
-        return false;
-    }
+    sdlWindow = SDL_CreateWindow("Octogenarian",
+                             SDL_WINDOWPOS_UNDEFINED,
+                             SDL_WINDOWPOS_UNDEFINED,
+                             0, 0,
+                            SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+    renderer = SDL_CreateRenderer(sdlWindow, -1, 0);
 
     cursor = Cursor((screenWidth / scale) / 2, (screenHeight / scale) / 2);
+
+    Uint32 rmask, gmask, bmask, amask;
+
+    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+       on the endianness (byte order) of the machine */
+	#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    	rmask = 0xff000000;
+    	gmask = 0x00ff0000;
+    	bmask = 0x0000ff00;
+    	amask = 0x000000ff;
+	#else
+   		rmask = 0x000000ff;
+    	gmask = 0x0000ff00;
+    	bmask = 0x00ff0000;
+    	amask = 0xff000000;
+	#endif
+
+    Surf_Display = SDL_CreateRGBSurface(0, screenWidth, screenHeight, 32,
+                                   rmask, gmask, bmask, amask);
+    sdlTexture = SDL_CreateTexture(renderer,
+                                            SDL_PIXELFORMAT_ARGB8888,
+                                            SDL_TEXTUREACCESS_STREAMING,
+                                            screenWidth, screenHeight);
 
     for(int i = 0; i < 322; i++) { // init them all to false
    		KEYS[i] = false;
 	}
-
-	SDL_EnableKeyRepeat(0,0);
 
 	InitColors();
 	InitCA();
@@ -80,6 +106,25 @@ void CApp::OnLoop(){
 }
 
 void CApp::OnRender(){
+/*	std::vector<std::vector<int> > data = automaton.GetData();
+	SDL_SetRenderDrawColor(renderer, Colors[0].r,  Colors[0].b, Colors[0].g, 255);
+	SDL_RenderClear(renderer);
+	SDL_Rect cur = {cursor.GetX() * scale, cursor.GetY() * scale, scale, scale};
+	for(int i = 0; i < data.size(); i++){
+		for(int j = 0; j < data[0].size(); j++){
+			SDL_Rect cell = {i * scale, j * scale, scale, scale};
+			if(data[i][j])
+				SDL_SetRenderDrawColor(renderer, Colors[data[i][j]].r,  Colors[data[i][j]].b, Colors[data[i][j]].g, 255);
+				SDL_RenderFillRect(renderer, &cell);
+		}
+	}
+	if(paused){
+		SDL_SetRenderDrawColor(renderer, CursorColor.r,  CursorColor.b, CursorColor.g, 255);
+		SDL_RenderDrawRect(renderer, &cur);
+	}
+	//SDL_Delay(1000);
+	SDL_RenderPresent(renderer);
+	//SDL_Flip(Surf_Display);*/
 	std::vector<std::vector<int> > data = automaton.GetData();
 	SDL_FillRect(Surf_Display, NULL, Colors[0]);
 	SDL_Rect cur = {cursor.GetX() * scale, cursor.GetY() * scale, scale, scale};
@@ -92,7 +137,11 @@ void CApp::OnRender(){
 	}
 	if(paused) SDL_FillRect(Surf_Display, &cur, CursorColor);
 	//SDL_Delay(1000);
-	SDL_Flip(Surf_Display);
+	//SDL_Flip(Surf_Display);
+	SDL_UpdateTexture(sdlTexture, NULL, Surf_Display->pixels, Surf_Display->pitch);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, sdlTexture, NULL, NULL);
+	SDL_RenderPresent(renderer);
 }
 
 void CApp::OnCleanup(){
@@ -113,24 +162,44 @@ void CApp::InitCA(){
 }
 
 void CApp::InitColors(){
-	Colors[0] = SDL_MapRGB(Surf_Display->format, 255, 255, 255);
-	Colors[1] = SDL_MapRGB(Surf_Display->format, 2, 227, 145);
-	Colors[2] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[3] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[4] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[5] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[6] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[7] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[8] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	Colors[9] = SDL_MapRGB(Surf_Display->format, 227, 2, 84);
-	CursorColor = SDL_MapRGBA(Surf_Display->format, 105, 105, 105, 100);
+/*	Colors[0].r = 255;
+	Colors[0].b = 255;
+	Colors[0].g = 255;
+	Colors[1].r = 2;
+	Colors[1].b = 227;
+	Colors[1].g = 145;
+	Colors[2].r = 227;
+	Colors[2].b = 2;
+	Colors[2].g = 84;
+	Colors[3] = Colors[2];
+	Colors[4] = Colors[2];
+	Colors[5] = Colors[2];
+	Colors[6] = Colors[2];
+	Colors[7] = Colors[2];
+	Colors[8] = Colors[2];
+	Colors[9] = Colors[2];
+	CursorColor.r = 105;
+	CursorColor.b = 105;
+	CursorColor.g = 105;*/
+	SDL_PixelFormat* format = SDL_AllocFormat(SDL_GetWindowPixelFormat(sdlWindow));
+	Colors[0] = SDL_MapRGB(format, 255, 255, 255);
+	Colors[1] = SDL_MapRGB(format, 2, 227, 145);
+	Colors[2] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[3] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[4] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[5] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[6] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[7] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[8] = SDL_MapRGB(format, 227, 2, 84);
+	Colors[9] = SDL_MapRGB(format, 227, 2, 84);
+	CursorColor = SDL_MapRGBA(format, 105, 105, 105, 100);
 }
 
 void CApp::OnExit(){
 	Running = false;
 }
 
-void CApp::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode){
+void CApp::OnKeyUp(SDL_Keycode sym, Uint16 mod){
 	switch(sym){
 		case SDLK_ESCAPE:
 			Running = false;
@@ -195,7 +264,7 @@ void CApp::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode){
 	}
 }
 
-void CApp::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode){
+void CApp::OnKeyDown(SDL_Keycode sym, Uint16 mod){
 	if(sym == SDLK_w)
 		cursor.Move(0, 5);
 	if(sym == SDLK_s)

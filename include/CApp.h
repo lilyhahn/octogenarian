@@ -7,6 +7,9 @@ class CApp : public CEvent{
 private:
 	bool Running;
 
+	SDL_Window *sdlWindow;
+	SDL_Renderer *renderer;
+	SDL_Texture *sdlTexture;
 	SDL_Surface* Surf_Display;
 
 	int scale;
@@ -51,8 +54,8 @@ public:
 
 	void OnExit();
 
-	void OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode);
+	void OnKeyUp(SDL_Keycode sym, Uint16 mod);
 
-	void OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
+	void OnKeyDown(SDL_Keycode sym, Uint16 mod);
 
 };
