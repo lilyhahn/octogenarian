@@ -10,6 +10,7 @@ private:
 	SDL_Window *sdlWindow;
 	SDL_Renderer *renderer;
 	SDL_Texture *sdlTexture;
+	SDL_Surface* Surf_Display;
 
 	int scale;
 
@@ -19,9 +20,9 @@ private:
 
 	CellularAutomaton automaton;
 
-	SDL_Color Colors[10];
+	Uint32 Colors[10];
 
-	SDL_Color CursorColor;
+	Uint32 CursorColor;
 
 	Cursor cursor;
 
