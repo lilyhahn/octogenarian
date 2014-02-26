@@ -1,5 +1,6 @@
 #include <CApp.h>
-
+#include <iostream>
+#include <unistd.h> // direct.h for windows?
 
 CApp::CApp(){
 	Surf_Display = NULL;
@@ -7,6 +8,7 @@ CApp::CApp(){
 	paused = true;
 	scale = 4;
 	brush = 1;
+	typing = false;
 }
 
 int CApp::OnExecute(){
@@ -79,15 +81,24 @@ bool CApp::OnInit(){
    		KEYS[i] = false;
 	}
 
+	chdir(SDL_GetBasePath());
+
+	TTF_Init();
+
+	TTF_Font* font = TTF_OpenFont("text.ttf", 12);
+	SDL_Color textclr = {0, 0, 0, 255};
+	textInput = new TextInput(font, textclr, false);
+
 	InitColors();
 	InitCA();
 
 	return true;
-
 }
 
 void CApp::OnEvent(SDL_Event* Event){
     CEvent::OnEvent(Event);
+    if(textInput->IsEnabled())
+    	textInput->Update(Event);
 }
 
 void CApp::HandleInput(){
@@ -138,6 +149,11 @@ void CApp::OnRender(){
 	if(paused) SDL_FillRect(Surf_Display, &cur, CursorColor);
 	//SDL_Delay(1000);
 	//SDL_Flip(Surf_Display);
+	if(textInput->IsEnabled()){
+		SDL_Surface* textSurf = textInput->Render();
+		//SDL_Rect destrect = {0, textSurf->h, textSurf->w, textSurf->h};
+		SDL_BlitSurface(textSurf, NULL, Surf_Display, NULL);
+	}
 	SDL_UpdateTexture(sdlTexture, NULL, Surf_Display->pixels, Surf_Display->pitch);
 	SDL_RenderClear(renderer);
 	SDL_RenderCopy(renderer, sdlTexture, NULL, NULL);
@@ -145,6 +161,8 @@ void CApp::OnRender(){
 }
 
 void CApp::OnCleanup(){
+	delete textInput;
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -200,77 +218,95 @@ void CApp::OnExit(){
 }
 
 void CApp::OnKeyUp(SDL_Keycode sym, Uint16 mod){
-	switch(sym){
-		case SDLK_ESCAPE:
-			Running = false;
-			break;
+	if(!textInput->IsEnabled()){
+		switch(sym){
+			case SDLK_ESCAPE:
+				Running = false;
+				break;
+			case SDLK_RETURN:
+				paused = !paused;
+				break;
+			case SDLK_UP:
+				cursor.Move(0, 1);
+				break;
+			case SDLK_DOWN:
+				cursor.Move(0, -1);
+				break;
+			case SDLK_RIGHT:
+				cursor.Move(1, 0);
+				break;
+			case SDLK_LEFT:
+				cursor.Move(-1, 0);
+				break;
+			case SDLK_SPACE:
+				cursor.Draw(automaton, brush);
+				break;
+			case SDLK_n:
+				automaton.NextGeneration();
+				break;
+			case SDLK_1:
+				brush = 1;
+				break;
+			case SDLK_2:
+				brush = 2;
+				break;
+			case SDLK_3:
+				brush = 3;
+				break;
+			case SDLK_4:
+				brush = 4;
+				break;
+			case SDLK_5:
+				brush = 5;
+				break;
+			case SDLK_6:
+				brush = 6;
+				break;
+			case SDLK_7:
+				brush = 7;
+				break;
+			case SDLK_8:
+				brush = 8;
+				break;
+			case SDLK_9:
+				brush = 9;
+				break;
+			case SDLK_0:
+				brush = 0;
+				break;
+			case SDLK_c:
+				automaton.Clear();
+				break;
+			case SDLK_e:
+				textInput->Start();
+				//automaton.SaveMCL("test.mcl");
+				break;
+		}
+	}
+	else{
+		switch(sym){
 		case SDLK_RETURN:
-			paused = !paused;
+			textInput->Stop();
+			automaton.SaveMCL(textInput->GetText());
+			textInput->SetText("");
 			break;
-		case SDLK_UP:
-			cursor.Move(0, 1);
+		case SDLK_ESCAPE:
+			textInput->Stop();
+			textInput->SetText("");
 			break;
-		case SDLK_DOWN:
-			cursor.Move(0, -1);
-			break;
-		case SDLK_RIGHT:
-			cursor.Move(1, 0);
-			break;
-		case SDLK_LEFT:
-			cursor.Move(-1, 0);
-			break;
-		case SDLK_SPACE:
-			cursor.Draw(automaton, brush);
-			break;
-		case SDLK_n:
-			automaton.NextGeneration();
-			break;
-		case SDLK_1:
-			brush = 1;
-			break;
-		case SDLK_2:
-			brush = 2;
-			break;
-		case SDLK_3:
-			brush = 3;
-			break;
-		case SDLK_4:
-			brush = 4;
-			break;
-		case SDLK_5:
-			brush = 5;
-			break;
-		case SDLK_6:
-			brush = 6;
-			break;
-		case SDLK_7:
-			brush = 7;
-			break;
-		case SDLK_8:
-			brush = 8;
-			break;
-		case SDLK_9:
-			brush = 9;
-			break;
-		case SDLK_0:
-			brush = 0;
-			break;
-		case SDLK_c:
-			automaton.Clear();
-			break;
-		case SDLK_e:
-			automaton.SaveMCL("test.mcl");
-			break;
+		}
 	}
 }
 
 void CApp::OnKeyDown(SDL_Keycode sym, Uint16 mod){
-	if(sym == SDLK_w)
-		cursor.Move(0, 5);
-	if(sym == SDLK_s)
-		cursor.Move(0, -5);
-	if(sym == SDLK_d)
-		cursor.Move(5, 0);
-	if(sym == SDLK_a)
-		cursor.Move(-5, 0);
+	if(!typing){
+		if(sym == SDLK_w)
+			cursor.Move(0, 1);
+		if(sym == SDLK_s)
+			cursor.Move(0, -1);
+		if(sym == SDLK_d)
+			cursor.Move(1, 0);
+		if(sym == SDLK_a)
+			cursor.Move(-1, 0);
+	}
 }

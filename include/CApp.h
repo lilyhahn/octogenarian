@@ -1,7 +1,9 @@
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <vector>
 #include <Cursor.h>
 #include <CEvent.h>
+#include <TextInput.h>
 
 class CApp : public CEvent{
 private:
@@ -30,6 +32,11 @@ private:
 
 	int brush;
 
+	std::string text;
+
+	bool typing;
+
+	TextInput* textInput;
 
 public:
 	int screenWidth, screenHeight;
