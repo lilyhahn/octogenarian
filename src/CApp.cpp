@@ -1,6 +1,11 @@
 #include <CApp.h>
 #include <iostream>
-#include <unistd.h> // direct.h for windows?
+#ifdef _WIN32
+	#include <direct.h>
+	#define chdir _chdir
+#else
+	#include <unistd.h> // direct.h for windows?
+#endif
 
 CApp::CApp(){
 	Surf_Display = NULL;
@@ -85,7 +90,7 @@ bool CApp::OnInit(){
 
 	TTF_Init();
 
-	TTF_Font* font = TTF_OpenFont("text.ttf", 12);
+	TTF_Font* font = TTF_OpenFont("text.ttf", 24);
 	SDL_Color textclr = {0, 0, 0, 255};
 	textInput = new TextInput(font, textclr, false);
 

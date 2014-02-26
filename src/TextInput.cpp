@@ -36,19 +36,21 @@ void TextInput::Update(SDL_Event* event){
 }
 
 SDL_Surface* TextInput::Render(){
-	return TTF_RenderText_Solid(font, text.c_str(), color);
+	return TTF_RenderText_Blended(font, text.c_str(), color);
 }
 
 TextInput::TextInput(TTF_Font* fnt, SDL_Color clr){
 	newlines = true;
 	font = fnt;
 	color = clr;
+	typing = false;
 }
 
 TextInput::TextInput(TTF_Font* fnt, SDL_Color clr, bool useNewlines){
 	newlines = useNewlines;
 	font = fnt;
 	color = clr;
+	typing = false;
 }
 
 TextInput::~TextInput(){
